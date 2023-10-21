@@ -8,14 +8,14 @@ import { NotFoundTask } from './NotFoundTask';
 import { FormEvent, useState, ChangeEvent, InvalidEvent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface TaskData {
+export interface TaskType {
   id: string;
   content: string;
   isDone: boolean;
 }
 
 export function App(){
-  const [tasks, setTasks] = useState<TaskData[]>([]);
+  const [tasks, setTasks] = useState<TaskType[]>([]);
   const [newTask, setNewTask] = useState("");
 
   function handleCreateNewTask(event: FormEvent){
@@ -74,18 +74,19 @@ export function App(){
               </div>
               <div className={styles.info} style={{ color: 'var(--purple)'}}>
                 Concluídas 
-                <span>{ tasks?.filter((task: TaskData) => task.isDone)?.length } de { tasks?.length }</span>
+                <span>
+                  { tasks?.length > 0 && `${tasks?.filter((task: TaskType) => task.isDone)?.length} de ` } 
+                  {tasks?.length}
+                </span>
               </div>
             </div>
             {
               tasks?.length > 0 ? tasks.map(
-                (task: TaskData) => {
+                (task: TaskType) => {
                   return (
                     <Task
                       key={task.id}
-                      id={task.id}
-                      content={task.content}
-                      isDone={task.isDone}
+                      task={task}
                       onDeleteTask={deleteTask}
                       onTaskStatusChange={taskStatusChange}
                     />

@@ -1,13 +1,14 @@
 import { Trash } from 'phosphor-react';
 import styles from './Task.module.css';
-import { TaskData } from './App';
+import { TaskType } from './App';
 
-interface TaskProps extends TaskData {
+interface TaskProps {
+  task: TaskType;
   onDeleteTask: (id: string) => void;
   onTaskStatusChange: (id: string) => void;
 }
 
-export function Task({ id, content, isDone, onDeleteTask, onTaskStatusChange }: TaskProps){
+export function Task({ task: { id, content, isDone }, onDeleteTask, onTaskStatusChange }: TaskProps){
   function handleDeleteTask(){
     onDeleteTask(id);
   }
