@@ -1,35 +1,100 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Header } from './Header';
 
-function App() {
-  const [count, setCount] = useState(0)
+import './global.css';
+import styles from './App.module.css';
+import { PlusCircle } from 'phosphor-react';
+import { Task } from './Task';
+import { NotFoundTask } from './NotFoundTask';
+import { FormEvent, useState, ChangeEvent, InvalidEvent } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
+export interface TaskData {
+  id: string;
+  content: string;
+  isDone: boolean;
+}
+
+export function App(){
+  const [tasks, setTasks] = useState<TaskData[]>([]);
+  const [newTask, setNewTask] = useState("");
+
+  function handleCreateNewTask(event: FormEvent){
+    event?.preventDefault();
+    
+    const task = { content: newTask, isDone: false, id: uuidv4()};
+
+    setTasks([...tasks, task]);
+    setNewTask("");
+  }
+
+  function handleNewTaskChange(event: ChangeEvent<HTMLInputElement>){
+    event.target.setCustomValidity('');
+    setNewTask(event.target.value);
+  }
+
+  function deleteTask(idTaskToDelete: string){
+    const tasksWithoutDeletedOne = tasks.filter( task => task.id !== idTaskToDelete);
+    setTasks(tasksWithoutDeletedOne);
+  }
+
+  function taskStatusChange(idTaskToStatusChange: string){
+    setTasks(
+        tasks.map((task) =>
+          task.id === idTaskToStatusChange
+            ? { ...task, isDone: !task.isDone }
+            : task
+        )
+      )
+  }
+  
+  function handleNewTaskInvalid(event: InvalidEvent<HTMLInputElement>){
+    event?.target.setCustomValidity('Este campo é obrigatório!');
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <Header />
+      <div className={styles.wrapper}>
+        <main>
+          <form className={styles.createTaskForm} onSubmit={handleCreateNewTask}>
+            <input
+              value={newTask} 
+              onChange={handleNewTaskChange} 
+              placeholder='Adicione uma nova tarefa'
+              onInvalid={handleNewTaskInvalid}
+              required
+            />
+            <button type='submit'>Criar <PlusCircle size={16} weight="bold"/></button>
+          </form>
+          
+          <div className={styles.taskBoard}>
+            <div className={styles.taskBar}>
+              <div className={styles.info} style={{ color: 'var(--blue)'}}>
+                Tarefas criadas <span>{ tasks?.length }</span>
+              </div>
+              <div className={styles.info} style={{ color: 'var(--purple)'}}>
+                Concluídas 
+                <span>{ tasks?.filter((task: TaskData) => task.isDone)?.length } de { tasks?.length }</span>
+              </div>
+            </div>
+            {
+              tasks?.length > 0 ? tasks.map(
+                (task: TaskData) => {
+                  return (
+                    <Task
+                      key={task.id}
+                      id={task.id}
+                      content={task.content}
+                      isDone={task.isDone}
+                      onDeleteTask={deleteTask}
+                      onTaskStatusChange={taskStatusChange}
+                    />
+                  )}
+              ) : <NotFoundTask />
+            }
+          </div>
+        </main>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
-
-export default App

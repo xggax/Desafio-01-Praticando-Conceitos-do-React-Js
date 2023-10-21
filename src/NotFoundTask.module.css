@@ -1,0 +1,19 @@
+.noTasks {
+  border-top: 1px solid var(--gray-400);
+  border-radius: 8px;
+  padding: 4rem 1.5rem 4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--gray-300);
+}
+
+.noTasks > img{
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.noTasks strong {
+  margin-top: 1rem;
+}
